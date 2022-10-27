@@ -4,18 +4,11 @@
 
 import os
 import sys
-import json
 import requests
 import argparse
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 from PIL import Image
 from io import BytesIO
-from torch import det
-from detect import detect
 import time
-import subprocess
 import shutil
 
 # set up the command line arguments
@@ -36,15 +29,17 @@ parser.add_argument('--save_txt', action='store_true', help='save results to *.t
 parser.add_argument('--save_conf', action='store_true', help='save confidences in --save-txt labels')
 parser.add_argument('--save_crop', action='store_true', help='save cropped prediction boxes')
 parser.add_argument('--nosave', action='store_true', help='do not save images/videos')
-parser.add_argument('--project_name', type=str, default='Demo', help='name of the project in Label Studio')
+parser.add_argument('--project_name', type=str, default='Predictions', help='name of the project in Label Studio')
 parser.add_argument('--label_config', type=str, default='./label_config.xml', help='path to the label config file')
 parser.add_argument('--label_config_url', type=str, default=None, help='URL of the label config file')
 parser.add_argument('--label_config_json', type=str, default=None, help='path to the label config JSON file')
+# API Token
+parser.add_argument('--api_token', type=str, default='dd3f146381240448ef590c41563d274931ab6c84', help='API Token')
 
 args = parser.parse_args()
 
 # provide API authentication credentials
-TOKEN = 'dd3f146381240448ef590c41563d274931ab6c84'
+TOKEN = args.api_token
 
 # authenticate with the API
 response = requests.get(args.api_url + '/projects', headers={'Authorization': 'Token ' + TOKEN})
@@ -130,6 +125,7 @@ if len(url_files) > 0:
             image_list[i].save(os.path.join(args.url_image_dir, 'url_' + time_string + '_image' + str(i) + '.png'))
         # properly save WEBP format 
         elif image_list[i].format == 'WEBP':
+            print('image', i, 'is in WEBP format')
             image_list[i].save(os.path.join(args.url_image_dir, 'url_' + time_string + '_image' + str(i) + '.png'), format='PNG')
         else:
             print('image format not supported:', image_list[i].format, ' FOR IMAGE: ', image_list[i])
